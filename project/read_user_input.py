@@ -10,7 +10,8 @@ from utils.brick import TouchSensor, EV3UltrasonicSensor, wait_ready_sensors, re
 import time
 
 
-DOUBLE_CLICK_DELAY = 0.01  # seconds of delay between measurements
+DOUBLE_CLICK_DELAY = 0.5  # seconds of delay between measurements
+HOLD_CLICK_DELAY = 1
 
 print("Program start. Waiting for sensors.")
 
@@ -27,26 +28,15 @@ def get_touch_input():
         while TOUCH_SENSOR.is_pressed():
             time.sleep(0.01)
             time_passed += 0.01
-            if time_passed >= 1: return 0 #hold click
-        if time_passed < 1: #check for single or double click
-            time_passed = 0
-            while not TOUCH_SENSOR.is_pressed():
-                time.sleep(0.01)
-                time_passed += 0.01
-                if time_passed > 0.5: break#check if the button is clicked again within a half second of first click
-            #print(time_passed)
-            if time_passed > 0.5: return 1 # Single click
-            else: return 2 #double click
-        else:
-            time_passed = 0
-            while time_passed < 0.8:
-                if not TOUCH_SENSOR.is_pressed():
-                    # single click
-                    break
-                time.sleep(0.01)
-                time_passed += 0.01
-            if time_passed >= 0.8: return 0 #hold click
-            else: return 1 #single click
+            if time_passed >= HOLD_CLICK_DELAY: return 0 #hold click
+        time_passed = 0
+        while not TOUCH_SENSOR.is_pressed():
+            time.sleep(0.01)
+            time_passed += 0.01
+            if time_passed > DOUBLE_CLICK_DELAY: break#check if the button is clicked again within a half second of first click
+        #print(time_passed)
+        if time_passed > DOUBLE_CLICK_DELAY: return 1 # Single click
+        else: return 2 #double click
     else: return None
 
 def read_user_input(arr):
@@ -74,19 +64,6 @@ def read_user_input(arr):
             continue
     #read in button touches to arr
     print(arr)
-    
-def place_cube(x, y):
-    move_arm_up()
-    #receives x and y coordinates (0-4, 0-4)
-    #find position of robot
-    #decide which directions to move motors
-    #move motors a small amount in that direction
-    #repeat
-    #if distance moved is small enough, assume we have reached our destination
-    
-    move_arm_down()
-    release_cube()
-    #repeat
 
 if __name__ == "__main__":
     input_arr = []
@@ -97,5 +74,7 @@ if __name__ == "__main__":
             print("Invalid input. Max. 15 ones. " + str(input_arr))
             continue
         valid = True
+
+    #once we reach this line our data is valid
                   
     
