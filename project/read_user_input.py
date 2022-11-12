@@ -8,73 +8,63 @@ It must be run on the robot.
 from utils import sound
 from utils.brick import TouchSensor, EV3UltrasonicSensor, wait_ready_sensors, reset_brick
 import time
-
+import pickle
 
 DOUBLE_CLICK_DELAY = 0.5  # seconds of delay between measurements
 HOLD_CLICK_DELAY = 1
-
-print("Program start. Waiting for sensors.")
-
-TOUCH_SENSOR = TouchSensor(1)
-
-
-wait_ready_sensors(True) # Input True to see what the robot is trying to initialize! False to be silent.
-print("Done waiting.")
-        
+TOUCH_SENSOR = TouchSensor(1)       
         
 def get_touch_input():
     if TOUCH_SENSOR.is_pressed(): #detect first click
-        time_passed = 0
-        while TOUCH_SENSOR.is_pressed():
+        duration_of_first_click = 0
+        while TOUCH_SENSOR.is_pressed(): #in this while loop we record how long the first click is held
             time.sleep(0.01)
-            time_passed += 0.01
-            if time_passed >= HOLD_CLICK_DELAY: return 0 #hold click
-        time_passed = 0
-        while not TOUCH_SENSOR.is_pressed():
+            duration_of_first_click += 0.01
+            if duration_of_first_click >= HOLD_CLICK_DELAY: return 0 #hold click if first click is held long enough
+        #if we're here it's not a hold click, and the first click was released
+        time_between_clicks = 0
+        while not TOUCH_SENSOR.is_pressed(): #this while loop records the delay after the first click
             time.sleep(0.01)
-            time_passed += 0.01
-            if time_passed > DOUBLE_CLICK_DELAY: break#check if the button is clicked again within a half second of first click
-        #print(time_passed)
-        if time_passed > DOUBLE_CLICK_DELAY: return 1 # Single click
-        else: return 2 #double click
-    else: return None
+            time_between_clicks += 0.01
+            if time_between_clicks > DOUBLE_CLICK_DELAY: return 1 #if the delay is long enough then it is a single click
+        #if we reach this line, the user clicked the button again within the double click delay
+        return 2 #double click
+    else: return None #if there is no initial click we do nothing
 
 def read_user_input(arr):
-    arr = [[0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0]]
-    print("Single click to append a '1' to the input array.\n Double click to append a '0' to the input array. \n Triple click to reset the input array.")
+    arr = [['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_']]
+    print("Single click to append a '0' to the input array.")
+    print("Double click to append a '1' to the input array.")
+    print("Hold click to reset the array.")
     i = 0
+    one_count = 0
     while i < 25:
-        new_input = get_touch_input()
-        if new_input == 2:
-            arr[int(i/5)][(i)%5] = 0
-            i += 1
-            print(arr)
-            time.sleep(0.5)
-        elif new_input == 1:
+        new_input = get_touch_input() #detect type of click 
+        if new_input == 2: #double click
+            if one_count >= 15: print("Warning: Cannot append another 1. (maximum 15 ones per input)")
             arr[int(i/5)][(i)%5] = 1
-            print(arr)
+            i += 1
+            one_count += 1
+            print("Appended 1: " + str(arr))
+            time.sleep(0.5)
+        elif new_input == 1: #single click
+            arr[int(i/5)][(i)%5] = 0
+            print("Appended 0: " + str(arr))
             i += 1
             time.sleep(0.5)
-        elif new_input == 0:
-            arr = [[0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0], [0,0,0,0,0]]
-            print(arr)
+        elif new_input == 0: #hold
+            arr = [['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_']]
+            print("Reset input to: " + str(arr))
             i = 0
+            one_count = 0
             time.sleep(0.5)
-        else:
-            continue
-    #read in button touches to arr
-    print(arr)
 
 if __name__ == "__main__":
-    input_arr = []
-    valid = False
-    while not valid:
-        read_user_input(input_arr)
-        if len(input_arr) != 5 or len(input_arr[0]) != 5 or input_list.count(1) > 15:
-            print("Invalid input. Max. 15 ones. " + str(input_arr))
-            continue
-        valid = True
+    print("Program start. Waiting for sensors.")
+    wait_ready_sensors(True) # Input True to see what the robot is trying to initialize! False to be silent.
+    print("Done.")
+    input_arr = read_user_input() #reads the user's input into input_arr until a valid array is obtained
 
-    #once we reach this line our data is valid
-                  
+    #once we reach this line our data is valid and can be used
+
     
