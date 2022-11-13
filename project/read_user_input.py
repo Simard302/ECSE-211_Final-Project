@@ -31,7 +31,7 @@ def get_touch_input():
         return 2 #double click
     else: return None #if there is no initial click we do nothing
 
-def read_user_input(arr):
+def read_user_input():
     arr = [['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_']]
     print("Single click to append a '0' to the input array.")
     print("Double click to append a '1' to the input array.")
