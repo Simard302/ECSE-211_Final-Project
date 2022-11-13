@@ -60,6 +60,7 @@ def read_user_input():
             i = 0
             one_count = 0
             time.sleep(0.5)
+    return arr
 
 if __name__ == "__main__":
     print("Program start. Waiting for sensors.")
