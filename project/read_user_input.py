@@ -41,7 +41,9 @@ def read_user_input():
     while i < 25:
         new_input = get_touch_input() #detect type of click 
         if new_input == 2: #double click
-            if one_count >= 15: print("Warning: Cannot append another 1. (maximum 15 ones per input)")
+            if one_count >= 15:
+                print("Warning: Cannot append another 1. (maximum 15 ones per input)")
+                continue
             arr[int(i/5)][(i)%5] = 1
             i += 1
             one_count += 1
