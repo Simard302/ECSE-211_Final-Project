@@ -5,69 +5,84 @@ This test is used to collect data from the ultrasonic sensor.
 It must be run on the robot.
 """
 
-from utils import sound
+from utils.sound import Sound
 from utils.brick import TouchSensor, EV3UltrasonicSensor, wait_ready_sensors, reset_brick
 import time
-import pickle
 
-DOUBLE_CLICK_DELAY = 0.5  # seconds of delay between measurements
+
 HOLD_CLICK_DELAY = 1
-TOUCH_SENSOR = TouchSensor(1)       
+
+print("Program start. Waiting for sensors.")
+
+ONE_TOUCH_SENSOR = TouchSensor(1)
+ZERO_TOUCH_SENSOR = TouchSensor(2)
+RESET_TOUCH_SENSOR = TouchSensor(3)
+
+
+append_tone = Sound(duration=1.0, volume=80, pitch="G4")
+remove_tone = Sound(duration=2.0, volume=80, pitch="A4")
+reset_tone = Sound(duration=2.0, volume=80, pitch="B4")
+complete_tone = Sound(duration=0.5, volume=80, pitch="C5")
+
+
+wait_ready_sensors(True) # Input True to see what the robot is trying to initialize! False to be silent.
+print("Done waiting.")
+        
         
 def get_touch_input():
-    if TOUCH_SENSOR.is_pressed(): #detect first click
-        duration_of_first_click = 0
-        while TOUCH_SENSOR.is_pressed(): #in this while loop we record how long the first click is held
+    if ONE_TOUCH_SENSOR.is_pressed(): #detect click on 0 button
+        return (0, 1)
+    elif ZERO_TOUCH_SENSOR.is_pressed(): #detect click on 0 button
+        return (1, 1)
+    elif RESET_TOUCH_SENSOR.is_pressed(): #detect first click on reset button
+        time_passed = 0
+        while RESET_TOUCH_SENSOR.is_pressed():
             time.sleep(0.01)
-            duration_of_first_click += 0.01
-            if duration_of_first_click >= HOLD_CLICK_DELAY: return 0 #hold click if first click is held long enough
-        #if we're here it's not a hold click, and the first click was released
-        time_between_clicks = 0
-        while not TOUCH_SENSOR.is_pressed(): #this while loop records the delay after the first click
-            time.sleep(0.01)
-            time_between_clicks += 0.01
-            if time_between_clicks > DOUBLE_CLICK_DELAY: return 1 #if the delay is long enough then it is a single click
-        #if we reach this line, the user clicked the button again within the double click delay
-        return 2 #double click
-    else: return None #if there is no initial click we do nothing
+            time_passed += 0.01
+            if time_passed >= HOLD_CLICK_DELAY: return (2, 0) #hold click on reset button
+        return (2, 1)
+    else: return None
 
-def read_user_input():
-    arr = [['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_']]
-    print("Single click to append a '0' to the input array.")
-    print("Double click to append a '1' to the input array.")
-    print("Hold click to reset the array.")
+def read_user_input(arr):
+    arr = [["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"]]
+    print("Single click 1 button to append a '1' to the input array.\n Single click 0 button to append a '0' to the input array. \n Single click the backspace button to remove the last element from the input array. \n Hold click the backspace button to reset the input array.")
     i = 0
-    one_count = 0
     while i < 25:
-        new_input = get_touch_input() #detect type of click 
-        if new_input == 2: #double click
-            if one_count >= 15:
-                print("Warning: Cannot append another 1. (maximum 15 ones per input)")
-                continue
+        new_input = get_touch_input()
+        if new_input == (0, 1):
+            arr[int(i/5)][(i)%5] = 0
+            i += 1
+            print(arr)
+            append_tone.play() # Starts append_tone playing
+            append_tone.wait_done() # Will wait until append_tone is done playing (0.5 seconds)
+        elif new_input == (1, 1):
             arr[int(i/5)][(i)%5] = 1
             i += 1
-            one_count += 1
-            print("Appended 1: " + str(arr))
-            time.sleep(0.5)
-        elif new_input == 1: #single click
-            arr[int(i/5)][(i)%5] = 0
-            print("Appended 0: " + str(arr))
-            i += 1
-            time.sleep(0.5)
-        elif new_input == 0: #hold
-            arr = [['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_'], ['_','_','_','_','_']]
-            print("Reset input to: " + str(arr))
+            print(arr)
+            append_tone.play() # Starts append_tone playing
+            append_tone.wait_done() # Will wait until append_tone is done playing (0.5 seconds)
+        elif new_input == (2, 0):
+            arr = [["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"]]
+            print(arr)
             i = 0
-            one_count = 0
-            time.sleep(0.5)
-    return arr
+            reset_tone.play() # Starts reset_tone playing
+            reset_tone.wait_done() # Will wait until reset_tone is done playing (0.5 seconds)
+        elif new_input == (2, 1):
+            i -= 1
+            arr[int(i/5)][(i)%5] = "_"
+            print(arr)
+            remove_tone.play() # Starts remove_tone playing
+            remove_tone.wait_done() # Will wait until remove_tone is done playing (0.5 seconds)
+        else:
+            continue
+    #read in button touches to arr
+    print("Final array: " + str(arr))
+
 
 if __name__ == "__main__":
-    print("Program start. Waiting for sensors.")
-    wait_ready_sensors(True) # Input True to see what the robot is trying to initialize! False to be silent.
-    print("Done.")
-    input_arr = read_user_input() #reads the user's input into input_arr until a valid array is obtained
+    input_arr = []
+    read_user_input(input_arr)
 
-    #once we reach this line our data is valid and can be used
-
+    #once we reach this line our data is valid
+                  
     
