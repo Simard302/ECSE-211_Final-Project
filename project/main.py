@@ -76,9 +76,9 @@ class Robot():
         if load_existing and path.exists('calibration.json'):
             with open('calibration.json', 'r') as f:
                 js = load(f)
-                self.X_DIM = js['X_DIM'] + self.X_INIT_DEG
-                self.Y1_DIM = js['Y1_DIM'] + self.Y1_INIT_DEG
-                self.Y2_DIM = js['Y2_DIM'] + self.Y2_INIT_DEG
+                self.X_DIM = [x + self.X_INIT_DEG for x in js['X_DIM']]         # Adding init to relative pos for X
+                self.Y1_DIM = [y1 + self.Y1_INIT_DEG for y1 in js['Y1_DIM']]    # Adding init to relative pos for Y1
+                self.Y2_DIM = [y2 + self.Y2_INIT_DEG for y2 in js['Y2_DIM']]    # Adding init to relative pos for Y2
         
         # X calibration, find min and max positions of the grid
         for pos in [0, 1]:
