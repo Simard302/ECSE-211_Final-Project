@@ -199,25 +199,6 @@ class Robot():
                 if abs(cur_pos - end_pos[i]) > self.TOLERANCE:      # if motor is not at the end position (within tolerance), then break
                     break
                 if i == len(motors)-1: in_position = True           # Otherwise, if index is at last motor (so all motors are in position), then update in_position
-    
-    def get_touch_input(self):
-        """Read touch input and return the associated code
-
-        Returns:
-            Tuple(int, int): Tuple representing the pressed button and the code (button, code)
-        """
-        if self.TOUCH_SENSOR1.is_pressed():                         # Detect click on 0 button
-            return (1, 1)
-        elif self.TOUCH_SENSOR2.is_pressed():                       # Detect click on 1 button
-            return (0, 1)
-        elif self.TOUCH_SENSOR3.is_pressed():                       # Detect first click on reset button
-            time_passed = 0
-            while self.TOUCH_SENSOR3.is_pressed():
-                sleep(0.01)
-                time_passed += 0.01
-                if time_passed >= self.HOLD_CLICK_DELAY: return (2, 0) # Hold click on reset button
-            return (2, 1)                                           # Detect click on reset button
-        else: return None
 
 # Pre-configured arrays (for fun)
 HEART = [
