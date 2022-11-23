@@ -81,6 +81,7 @@ class Robot():
         
         # X calibration, find min and max positions of the grid
         for pos in [0, 1]:
+            if self.X_DIM[pos] is not None: continue
             while True:
                 if DEBUG: print(self.MOTOR_X.get_position())    # Print current position (ONLY IN DEBUG MODE)
                 
@@ -101,6 +102,7 @@ class Robot():
         
         # Y calibration, find min and max positions of the grid
         for pos in [0, 1]:
+            if self.Y1_DIM[pos] is not None and self.Y2_DIM[pos] is not None: continue
             while True:
                 if DEBUG: print(f"{self.MOTOR_Y1.get_position()}, {self.MOTOR_Y1.get_position()}")    # Print current position (ONLY IN DEBUG MODE)
 
