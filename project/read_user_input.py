@@ -2,24 +2,41 @@
 
 
 from utils.sound import Sound
-from utils.brick import TouchSensor, EV3UltrasonicSensor, wait_ready_sensors, reset_brick
+from utils.brick import wait_ready_sensors
 import time
 
 
 HOLD_CLICK_DELAY = 0.75
 
-ONE_TOUCH_SENSOR = TouchSensor(1)
-ZERO_TOUCH_SENSOR = TouchSensor(2)
-RESET_TOUCH_SENSOR = TouchSensor(3)
+ONE_TOUCH_SENSOR = None
+ZERO_TOUCH_SENSOR = None
+RESET_TOUCH_SENSOR = None
 
+tone_volume = 100
+tone_duration = 0.5
 
-append_tone = Sound(duration=10, volume=80, pitch="A4")
-remove_tone = Sound(duration=1.0, volume=80, pitch="A4")
-reset_tone = Sound(duration=1.0, volume=80, pitch="A4")
-complete_tone = Sound(duration=1.0, volume=80, pitch="A5")        
+append_tone = Sound(duration=tone_duration, volume=tone_volume, pitch="A4")
+remove_tone = Sound(duration=tone_duration, volume=tone_volume, pitch="B4")
+error_tone = Sound(duration=tone_duration, volume=tone_volume, pitch="C4")
+reset_tone = Sound(duration=tone_duration, volume=tone_volume, pitch="G4")
+complete_tone1 = Sound(duration=tone_duration, volume=tone_volume, pitch="A5")
+complete_tone2 = Sound(duration=tone_duration, volume=tone_volume, pitch="B5")
+complete_tone2 = Sound(duration=tone_duration, volume=tone_volume, pitch="C5")     
         
+
+def set_touch_sensors(backButton, zeroButton, oneButton):
+    global ONE_TOUCH_SENSOR
+    global ZERO_TOUCH_SENSOR
+    global RESET_TOUCH_SENSOR
+    ONE_TOUCH_SENSOR = oneButton
+    ZERO_TOUCH_SENSOR = zeroButton
+    RESET_TOUCH_SENSOR = backButton
+
+
 def get_touch_input():
-    if ONE_TOUCH_SENSOR.is_pressed(): #detect click on 0 button
+    if ONE_TOUCH_SENSOR.is_pressed() and ZERO_TOUCH_SENSOR.is_pressed() and RESET_TOUCH_SENSOR.is_pressed():
+        return (3, 1)
+    elif ONE_TOUCH_SENSOR.is_pressed(): #detect click on 0 button
         return (1, 1)
     elif ZERO_TOUCH_SENSOR.is_pressed(): #detect click on 1 button
         return (0, 1)
@@ -33,13 +50,25 @@ def get_touch_input():
     else: return None
 
 def read_user_input(arr):
+    global complete_tone
+    global append_tone
+    global remove_tone
+    global error_tone
+    global reset_tone
     arr = [["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"]]
-    print("Single click 1 button to append a '1' to the input array.\n Single click 0 button to append a '0' to the input array. \n Single click the backspace button to remove the last element from the input array. \n Hold click the backspace button to reset the input array.")
+    print("Single click 1 button to append a '1' to the input array.\n Single click 0 button to append a '0' to the input array. \nSingle click the backspace button to remove the last element from the input array. \nHold click the backspace button to reset the input array.\nPress all three buttons at any time to finalize the input array (any undefined elements will be set to 0).")
     i = 0
     one_count = 0
     while i < 25:
         new_input = get_touch_input()
-        if new_input == (0, 1):
+        if new_input == (3, 1): #submit command
+            while arr[4][4] != 0:
+                arr[int(i/5)][(i)%5] = 0
+                i += 1
+            complete_tone.play()
+            print(str(arr))
+            return arr
+        elif new_input == (0, 1):
             arr[int(i/5)][(i)%5] = 0
             i += 1
             print(str(arr))
@@ -47,6 +76,7 @@ def read_user_input(arr):
         elif new_input == (1, 1):
             if one_count >= 15:
                 print("Cannot append another 1. (maximum 15 ones)")
+                error_tone.play()
                 continue
             one_count += 1
             arr[int(i/5)][(i)%5] = 1
@@ -67,6 +97,8 @@ def read_user_input(arr):
             remove_tone.play() # Starts remove_tone playing
         else: continue
         time.sleep(0.3)
+
+    
     #read in button touches to arr
     print("Final array: " + str(arr))
 

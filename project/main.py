@@ -4,6 +4,7 @@ from utils.brick import TouchSensor, Motor, wait_ready_sensors, reset_brick
 from time import sleep
 from json import dump, load
 from os import path
+from read_user_input import set_touch_sensors, read_user_input
 
 DEBUG = True                    # Debug mode (boolean) for extra prints
 
@@ -51,7 +52,10 @@ class Robot():
 
         # Wait for all sensors to initialize before getting positions
         wait_ready_sensors(True)
-
+        
+        # Set initialized sensors in other file as globals
+        set_touch_sensors(self.TOUCH_SENSOR3, self.TOUCH_SENSOR2, self.TOUCH_SENSOR1)
+        
         # Get all initial positions of motors (in degrees)
         self.X_INIT_DEG = self.MOTOR_X.get_position()
         self.Y1_INIT_DEG = self.MOTOR_Y1.get_position()
@@ -214,50 +218,6 @@ class Robot():
                 if time_passed >= self.HOLD_CLICK_DELAY: return (2, 0) # Hold click on reset button
             return (2, 1)                                           # Detect click on reset button
         else: return None
-        
-    def read_user_input(self):
-        """Read the full user input for a 5x5 grid of 0's and 1's
-
-        Returns:
-            Array(2d, int): 2D array of 0's and 1's read by the user input
-        """
-        arr = [["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"]]
-        print("Single click 1 button to append a '1' to the input array.\n Single click 0 button to append a '0' to the input array. \n Single click the backspace button to remove the last element from the input array. \n Hold click the backspace button to reset the input array.")
-        i = 0
-        one_count = 0
-        while i < 25:
-            new_input = self.get_touch_input()
-            if new_input == (0, 1):
-                arr[int(i/5)][(i)%5] = 0
-                i += 1
-                print(str(arr))
-                self.APPEND_TONE.play() # Starts append_tone playing
-            elif new_input == (1, 1):
-                if one_count >= 15:
-                    print("Cannot append another 1. (maximum 15 ones)")
-                    continue
-                one_count += 1
-                arr[int(i/5)][(i)%5] = 1
-                i += 1
-                print(str(arr))
-                self.APPEND_TONE.play() # Starts append_tone playing
-            elif new_input == (2, 0):
-                arr = [["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"]]
-                i = 0
-                one_count = 0
-                print(str(arr))
-                self.RESET_TONE.play() # Starts reset_tone playing
-            elif new_input == (2, 1):
-                i -= 1
-                if (arr[int(i/5)][(i)%5]) == 1: one_count -= 1
-                arr[int(i/5)][(i)%5] = "_"
-                print(str(arr))
-                self.REMOVE_TONE.play() # Starts remove_tone playing
-            else: continue
-            sleep(0.3)
-        #read in button touches to arr
-        print("Final array: " + str(arr))
-        return arr
 
 # Pre-configured arrays (for fun)
 HEART = [
@@ -279,7 +239,8 @@ if __name__ == "__main__":
     try:
         robot = Robot()                         # Initialize new Robot
         robot.calibrate_deg()                   # Calibrate robot (auto or manual)
-        matrix = robot.read_user_input()        # Read user input array
+        matrix = []
+        read_user_input(matrix)                 # Read user input array, pass by reference
         robot.draw_matrix(matrix)               # Draw cubes on grid using input array
     except:
         # Handle error feedback here
