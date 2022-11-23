@@ -31,8 +31,8 @@ class Robot():
         """
         
 
-        self.TOUCH_SENSOR1 = TouchSensor(1)         # Left
-        self.TOUCH_SENSOR2 = TouchSensor(2)         # Right
+        self.TOUCH_SENSOR1 = TouchSensor(1)         # Left, 1
+        self.TOUCH_SENSOR2 = TouchSensor(2)         # Right, 0
         self.TOUCH_SENSOR3 = TouchSensor(3)         # Reset
 
         self.MOTOR_X = Motor("D")                   # X motor, Negative is forward
@@ -43,12 +43,6 @@ class Robot():
         self.MOTOR_X.set_limits(power=self.MOTOR_POWER, dps=self.MOTOR_SPEED)
         self.MOTOR_Y1.set_limits(power=self.MOTOR_POWER, dps=self.MOTOR_SPEED)
         self.MOTOR_Y2.set_limits(power=self.MOTOR_POWER, dps=self.MOTOR_SPEED)
-
-        # Creating the tones
-        self.APPEND_TONE = Sound(duration=10, volume=80, pitch=self.TONES['APPEND'])
-        self.REMOVE_TONE = Sound(duration=1.0, volume=80, pitch=self.TONES['REMOVE'])
-        self.RESET_TONE = Sound(duration=1.0, volume=80, pitch=self.TONES['RESET'])
-        self.COMPLETE_TONE = Sound(duration=1.0, volume=80, pitch=self.TONES['COMPLETE']) 
 
         # Wait for all sensors to initialize before getting positions
         wait_ready_sensors(True)
