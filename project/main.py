@@ -78,6 +78,8 @@ class Robot():
                 self.X_DIM = js['X_DIM'] + self.X_INIT_DEG
                 self.Y1_DIM = js['Y1_DIM'] + self.Y1_INIT_DEG
                 self.Y2_DIM = js['Y2_DIM'] + self.Y2_INIT_DEG
+                f.close()
+            return
         
         # X calibration, find min and max positions of the grid
         for pos in [0, 1]:
@@ -135,6 +137,7 @@ class Robot():
                 "Y2_DIM": [y2 - self.Y2_INIT_DEG for y2 in self.Y2_DIM]         # Y2 Dimensions
             }
             dump(js, f)                                             # Dump the dictionary into a json file
+            f.close()
     
     def push_bar(self, idx):
         """Push the bar to its desired position (along Y axis)
