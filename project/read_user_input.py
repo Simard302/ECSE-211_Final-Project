@@ -34,9 +34,13 @@ def set_touch_sensors(backButton, zeroButton, oneButton):
 
 
 def get_touch_input():
-    if ONE_TOUCH_SENSOR.is_pressed() and ZERO_TOUCH_SENSOR.is_pressed() and RESET_TOUCH_SENSOR.is_pressed():
-        return (3, 1)
-    elif ONE_TOUCH_SENSOR.is_pressed(): #detect click on 0 button
+    global HOLD_CLICK_DELAY
+    if ONE_TOUCH_SENSOR.is_pressed(): #detect click on 0 button
+        time_passed = 0
+        while RESET_TOUCH_SENSOR.is_pressed():
+            time.sleep(0.01)
+            time_passed += 0.01
+            if time_passed >= HOLD_CLICK_DELAY: return (3, 1)
         return (1, 1)
     elif ZERO_TOUCH_SENSOR.is_pressed(): #detect click on 1 button
         return (0, 1)
@@ -73,28 +77,33 @@ def read_user_input(arr):
             i += 1
             print(str(arr))
             append_tone.play() # Starts append_tone playing
+            append_tone.wait_done()
         elif new_input == (1, 1):
             if one_count >= 15:
                 print("Cannot append another 1. (maximum 15 ones)")
                 error_tone.play()
+                error_tone.wait_done()
                 continue
             one_count += 1
             arr[int(i/5)][(i)%5] = 1
             i += 1
             print(str(arr))
             append_tone.play() # Starts append_tone playing
+            append_tone.wait_done()
         elif new_input == (2, 0):
             arr = [["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"]]
             i = 0
             one_count = 0
             print(str(arr))
             reset_tone.play() # Starts reset_tone playing
+            reset_tone.wait_done()
         elif new_input == (2, 1):
             i -= 1
             if (arr[int(i/5)][(i)%5]) == 1: one_count -= 1
             arr[int(i/5)][(i)%5] = "_"
             print(str(arr))
             remove_tone.play() # Starts remove_tone playing
+            remove_tone.wait_done()
         else: continue
         time.sleep(0.3)
 

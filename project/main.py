@@ -35,7 +35,7 @@ class Robot():
         self.TOUCH_SENSOR2 = TouchSensor(2)         # Right
         self.TOUCH_SENSOR3 = TouchSensor(3)         # Reset
 
-        self.MOTOR_X = Motor("C")                   # X motor, Negative is forward
+        self.MOTOR_X = Motor("D")                   # X motor, Negative is forward
         self.MOTOR_Y1 = Motor("A")                  # Y1 motor, Positive is forward
         self.MOTOR_Y2 = Motor("B")                  # Y2 motor (reverse), Negative is forward
 
@@ -81,9 +81,10 @@ class Robot():
         if load_existing and path.exists('calibration.json'):
             with open('calibration.json', 'r') as f:
                 js = load(f)
-                self.X_DIM = js['X_DIM'] + self.X_INIT_DEG
-                self.Y1_DIM = js['Y1_DIM'] + self.Y1_INIT_DEG
-                self.Y2_DIM = js['Y2_DIM'] + self.Y2_INIT_DEG
+                self.X_DIM = [x + self.X_INIT_DEG for x in js['X_DIM']]
+                self.Y1_DIM = [y + self.Y1_INIT_DEG for y in js['Y1_DIM']]
+                self.Y2_DIM = [y + self.Y2_INIT_DEG for y in js['Y2_DIM']]
+            return
         
         # X calibration, find min and max positions of the grid
         for pos in [0, 1]:
@@ -223,9 +224,9 @@ if __name__ == "__main__":
         matrix = []
         read_user_input(matrix)                 # Read user input array, pass by reference
         robot.draw_matrix(matrix)               # Draw cubes on grid using input array
-    except:
+    except Exception as e:
         # Handle error feedback here
-        pass
+        print(str(e))
     finally:
         # Reset BrickPi on failure
         reset_brick()
