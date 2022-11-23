@@ -5,7 +5,7 @@ from time import sleep
 from json import dump, load
 from os import path
 
-DEBUG = 1
+DEBUG = True                    # Debug mode (boolean) for extra prints
 
 class Robot():
     X_DIM = [None, None]        # X Dimensions min, max (in degrees)
@@ -17,7 +17,7 @@ class Robot():
     MOTOR_SPEED = 180           # Motors speed (in degrees per second)
     MOTOR_POWER = 100           # Motor power (in %)
 
-    TONES = {
+    TONES = {                   # Configuration for tones use
         "APPEND": "A4",
         "REMOVE": "A4",
         "RESET": "A4",
@@ -26,6 +26,8 @@ class Robot():
     
 
     def __init__(self):
+        """Initialize Robot. Set all devices and ports, configure devices, read initial positions
+        """
         
 
         self.TOUCH_SENSOR1 = TouchSensor(1)         # Left
