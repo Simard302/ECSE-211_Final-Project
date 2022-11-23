@@ -80,7 +80,6 @@ class Robot():
                 self.Y1_DIM = js['Y1_DIM'] + self.Y1_INIT_DEG
                 self.Y2_DIM = js['Y2_DIM'] + self.Y2_INIT_DEG
                 f.close()
-            return
         
         # X calibration, find min and max positions of the grid
         for pos in [0, 1]:
