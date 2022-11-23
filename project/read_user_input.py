@@ -2,15 +2,15 @@
 
 
 from utils.sound import Sound
-from utils.brick import TouchSensor, EV3UltrasonicSensor, wait_ready_sensors, reset_brick
+from utils.brick import wait_ready_sensors
 import time
 
 
 HOLD_CLICK_DELAY = 0.75
 
-ONE_TOUCH_SENSOR = TouchSensor(1)
-ZERO_TOUCH_SENSOR = TouchSensor(2)
-RESET_TOUCH_SENSOR = TouchSensor(3)
+ONE_TOUCH_SENSOR = None
+ZERO_TOUCH_SENSOR = None
+RESET_TOUCH_SENSOR = None
 
 tone_volume = 100
 tone_duration = 0.5

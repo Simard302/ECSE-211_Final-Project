@@ -2,6 +2,7 @@
 from utils.sound import Sound
 from utils.brick import TouchSensor, Motor, wait_ready_sensors, reset_brick
 from time import sleep
+from read_user_input import set_touch_sensors, read_user_input
 
 class Robot():
     X_DIM = [None, None]
@@ -33,6 +34,8 @@ class Robot():
         self.COMPLETE_TONE = Sound(duration=1.0, volume=80, pitch="A5") 
 
         wait_ready_sensors(True)
+
+        set_touch_sensors(self.TOUCH_SENSOR3, self.TOUCH_SENSOR2, self.TOUCH_SENSOR1)       # Set initialized sensors in other file as globals
 
         self.X_INIT_DEG = self.MOTOR_X.get_position()
         self.Y1_INIT_DEG = self.MOTOR_Y1.get_position()
@@ -163,45 +166,6 @@ class Robot():
                 if time_passed >= self.HOLD_CLICK_DELAY: return (2, 0) #hold click on reset button
             return (2, 1)
         else: return None
-        
-    def read_user_input(self):
-        arr = [["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"]]
-        print("Single click 1 button to append a '1' to the input array.\n Single click 0 button to append a '0' to the input array. \n Single click the backspace button to remove the last element from the input array. \n Hold click the backspace button to reset the input array.")
-        i = 0
-        one_count = 0
-        while i < 25:
-            new_input = self.get_touch_input()
-            if new_input == (0, 1):
-                arr[int(i/5)][(i)%5] = 0
-                i += 1
-                print(str(arr))
-                self.APPEND_TONE.play() # Starts append_tone playing
-            elif new_input == (1, 1):
-                if one_count >= 15:
-                    print("Cannot append another 1. (maximum 15 ones)")
-                    continue
-                one_count += 1
-                arr[int(i/5)][(i)%5] = 1
-                i += 1
-                print(str(arr))
-                self.APPEND_TONE.play() # Starts append_tone playing
-            elif new_input == (2, 0):
-                arr = [["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"]]
-                i = 0
-                one_count = 0
-                print(str(arr))
-                self.RESET_TONE.play() # Starts reset_tone playing
-            elif new_input == (2, 1):
-                i -= 1
-                if (arr[int(i/5)][(i)%5]) == 1: one_count -= 1
-                arr[int(i/5)][(i)%5] = "_"
-                print(str(arr))
-                self.REMOVE_TONE.play() # Starts remove_tone playing
-            else: continue
-            sleep(0.3)
-        #read in button touches to arr
-        print("Final array: " + str(arr))
-        return arr
 
 HEART = [
     [0, 1, 0, 1, 0],
@@ -215,7 +179,8 @@ if __name__ == "__main__":
     try:
         robot = Robot()
         robot.calibrate_deg()    # move by 8cm
-        matrix = robot.read_user_input()
+        matrix = []
+        read_user_input(matrix)  # Pass by reference
         robot.draw_matrix(matrix)
     except:
         # Handle error feedback here
