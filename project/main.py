@@ -5,6 +5,7 @@ from time import sleep
 from json import dump, load
 from os import path
 from read_user_input import set_touch_sensors, read_user_input
+from traceback import print_exc
 
 DEBUG = True                    # Debug mode (boolean) for extra prints
 
@@ -222,9 +223,9 @@ if __name__ == "__main__":
         matrix = []
         read_user_input(matrix)                 # Read user input array, pass by reference
         robot.draw_matrix(matrix)               # Draw cubes on grid using input array
-    except:
+    except Exception as e:
         # Handle error feedback here
-        pass
+        print_exc()
     finally:
         # Reset BrickPi on failure
         reset_brick()
