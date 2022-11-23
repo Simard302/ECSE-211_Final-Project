@@ -35,7 +35,7 @@ class Robot():
         self.TOUCH_SENSOR2 = TouchSensor(2)         # Right
         self.TOUCH_SENSOR3 = TouchSensor(3)         # Reset
 
-        self.MOTOR_X = Motor("C")                   # X motor, Negative is forward
+        self.MOTOR_X = Motor("D")                   # X motor, Negative is forward
         self.MOTOR_Y1 = Motor("A")                  # Y1 motor, Positive is forward
         self.MOTOR_Y2 = Motor("B")                  # Y2 motor (reverse), Negative is forward
 
