@@ -15,7 +15,8 @@ class Robot():
 
     TOLERANCE = 3               # Tolerance (in degrees)
     HOLD_CLICK_DELAY = 0.75     # Time to hold button (in seconds)
-    MOTOR_SPEED = 180           # Motors speed (in degrees per second)
+    MOTOR_SPEEDX = 180           # Motors speed (in degrees per second)
+    MOTOR_SPEEDY = 360           # Motors speed (in degrees per second)
     MOTOR_POWER = 100           # Motor power (in %)
 
     TONES = {                   # Configuration for tones use
@@ -35,14 +36,14 @@ class Robot():
         self.TOUCH_SENSOR2 = TouchSensor(2)         # Right
         self.TOUCH_SENSOR3 = TouchSensor(3)         # Reset
 
-        self.MOTOR_X = Motor("D")                   # X motor, Negative is forward
+        self.MOTOR_X = Motor("D")                   # X motor, Positive is forward
         self.MOTOR_Y1 = Motor("A")                  # Y1 motor, Positive is forward
         self.MOTOR_Y2 = Motor("B")                  # Y2 motor (reverse), Negative is forward
 
         # Setting limits for all motors
-        self.MOTOR_X.set_limits(power=self.MOTOR_POWER, dps=self.MOTOR_SPEED)
-        self.MOTOR_Y1.set_limits(power=self.MOTOR_POWER, dps=self.MOTOR_SPEED)
-        self.MOTOR_Y2.set_limits(power=self.MOTOR_POWER, dps=self.MOTOR_SPEED)
+        self.MOTOR_X.set_limits(power=self.MOTOR_POWER, dps=self.MOTOR_SPEEDX)
+        self.MOTOR_Y1.set_limits(power=self.MOTOR_POWER, dps=self.MOTOR_SPEEDY)
+        self.MOTOR_Y2.set_limits(power=self.MOTOR_POWER, dps=self.MOTOR_SPEEDY)
 
         # Creating the tones
         self.APPEND_TONE = Sound(duration=10, volume=80, pitch=self.TONES['APPEND'])
@@ -97,9 +98,9 @@ class Robot():
                     sleep(1)
                     break
                 elif self.TOUCH_SENSOR1.is_pressed():               # Forward
-                    self.MOTOR_X.set_position_relative(-10)
-                elif self.TOUCH_SENSOR2.is_pressed():               # Backward
                     self.MOTOR_X.set_position_relative(10)
+                elif self.TOUCH_SENSOR2.is_pressed():               # Backward
+                    self.MOTOR_X.set_position_relative(-10)
                 sleep(0.1)                                          # Sleep (refresh rate)
             self.X_DIM[pos] = self.MOTOR_X.get_position()           # Update current position
             if DEBUG: print(f"Dimension {pos}: {self.X_DIM[pos]}")  # Print final dimensions (ONLY IN DEBUG MODE)
@@ -216,13 +217,20 @@ X = [
     [0, 1, 0, 1, 0],
     [1, 0, 0, 0, 1]
 ]
+STAIR = [
+    [1, 0, 0, 0, 0],
+    [1, 1, 0, 0, 0],
+    [1, 1, 1, 0, 0],
+    [1, 1, 1, 1, 0],
+    [1, 1, 1, 1, 1]
+]
 
 if __name__ == "__main__":
     try:
         robot = Robot()                         # Initialize new Robot
         robot.calibrate_deg()                   # Calibrate robot (auto or manual)
-        matrix = []
-        read_user_input(matrix)                 # Read user input array, pass by reference
+        #matrix = read_user_input()              # Read user input array, pass by reference
+        matrix = STAIR
         robot.draw_matrix(matrix)               # Draw cubes on grid using input array
     except Exception as e:
         # Handle error feedback here

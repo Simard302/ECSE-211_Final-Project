@@ -6,7 +6,7 @@ from utils.brick import wait_ready_sensors
 import time
 
 
-HOLD_CLICK_DELAY = 0.75
+HOLD_CLICK_DELAY = 0.7
 
 ONE_TOUCH_SENSOR = None
 ZERO_TOUCH_SENSOR = None
@@ -19,9 +19,7 @@ append_tone = Sound(duration=tone_duration, volume=tone_volume, pitch="A4")
 remove_tone = Sound(duration=tone_duration, volume=tone_volume, pitch="B4")
 error_tone = Sound(duration=tone_duration, volume=tone_volume, pitch="C4")
 reset_tone = Sound(duration=tone_duration, volume=tone_volume, pitch="G4")
-complete_tone1 = Sound(duration=tone_duration, volume=tone_volume, pitch="A5")
-complete_tone2 = Sound(duration=tone_duration, volume=tone_volume, pitch="B5")
-complete_tone2 = Sound(duration=tone_duration, volume=tone_volume, pitch="C5")     
+complete_tone = Sound(duration=tone_duration, volume=tone_volume, pitch="C5")     
         
 
 def set_touch_sensors(backButton, zeroButton, oneButton):
@@ -53,7 +51,7 @@ def get_touch_input():
         return (2, 1)
     else: return None
 
-def read_user_input(arr):
+def read_user_input():
     global complete_tone
     global append_tone
     global remove_tone
@@ -105,11 +103,12 @@ def read_user_input(arr):
             remove_tone.play() # Starts remove_tone playing
             remove_tone.wait_done()
         else: continue
-        time.sleep(0.3)
+        time.sleep(0.2)
 
     
     #read in button touches to arr
     print("Final array: " + str(arr))
+    return arr
 
 
 if __name__ == "__main__":
