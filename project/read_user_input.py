@@ -25,6 +25,13 @@ note_map = {
 }        
 
 def set_touch_sensors(backButton, zeroButton, oneButton):
+    """Set touch sensor variables
+
+    Args:
+        backButton (TouchSensor): back button sensor
+        zeroButton (TouchSensor): zero button sensor
+        oneButton (TouchSensor): one button sensor
+    """
     global ONE_TOUCH_SENSOR
     global ZERO_TOUCH_SENSOR
     global RESET_TOUCH_SENSOR
@@ -33,6 +40,11 @@ def set_touch_sensors(backButton, zeroButton, oneButton):
     RESET_TOUCH_SENSOR = backButton
 
 def init_waves():
+    """Pre-generate all waves for necessary notes. Makes sound playing much faster
+
+    Returns:
+        dict: name:wave dictionary pair
+    """
     # Pre-generate all waves for existing notes
     # Makes the sound playing much faster
     note_waves = {}
@@ -46,6 +58,11 @@ def init_waves():
     return note_waves
 
 def get_touch_input():
+    """Convert touch sensor data to input function
+
+    Returns:
+        tuple(int, int): code for input function
+    """
     global HOLD_CLICK_DELAY
     if ONE_TOUCH_SENSOR.is_pressed(): #detect click on 0 button
         time_passed = 0
@@ -66,11 +83,38 @@ def get_touch_input():
     else: return None
 
 def play_sound(player, wave):
+    """Play sound wave. Stop any previous sounds if there were any
+
+    Args:
+        player (Player or None): current sound player
+        wave (Sound Wave): generated wave to play
+
+    Returns:
+        Player: new sound player
+    """
     if player is not None and player.is_playing():
         player.stop()
     return sa.play_buffer(wave, 1, 2, 8000) # Returns player
 
+def convert_char(x):
+    """Converts the array char to the char to print
+
+    Args:
+        x (int or str): character to convert
+
+    Returns:
+        char: converted character
+    """
+    if x==0: return ' '
+    elif x == 1: return 'X'
+    else: return x
+
 def read_user_input():
+    """Read user input and generate a matrix for the mosaic
+
+    Returns:
+        2D array: matrix for the mosaic
+    """
     note_waves = init_waves()
     arr = [["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"]]
     print("Single click 1 button to append a '1' to the input array.\n Single click 0 button to append a '0' to the input array. \nSingle click the backspace button to remove the last element from the input array. \nHold click the backspace to submit array, will fill missing entries with 0")
