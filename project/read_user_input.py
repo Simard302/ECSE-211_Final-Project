@@ -65,11 +65,6 @@ def get_touch_input():
     """
     global HOLD_CLICK_DELAY
     if ONE_TOUCH_SENSOR.is_pressed(): #detect click on 0 button
-        time_passed = 0
-        while RESET_TOUCH_SENSOR.is_pressed():
-            time.sleep(0.01)
-            time_passed += 0.01
-            if time_passed >= HOLD_CLICK_DELAY: return (3, 1)
         return (1, 1)
     elif ZERO_TOUCH_SENSOR.is_pressed(): #detect click on 1 button
         return (0, 1)
@@ -78,7 +73,7 @@ def get_touch_input():
         while RESET_TOUCH_SENSOR.is_pressed():
             time.sleep(0.01)
             time_passed += 0.01
-            if time_passed >= HOLD_CLICK_DELAY: return (2, 0) #hold click on reset button
+            if time_passed >= HOLD_CLICK_DELAY: return (3, 1) #hold click on reset button
         return (2, 1)
     else: return None
 
@@ -121,19 +116,21 @@ def read_user_input():
     i = 0
     one_count = 0
     player = None
-    while i < 25:
+    while True:
         new_input = get_touch_input()
         if new_input == (3, 1): #submit command
             while arr[4][4] != 0:
                 arr[int(i/5)][(i)%5] = 0
                 i += 1
-            break
-        elif new_input == (0, 1):
+            player = play_sound(player, note_waves["complete_tone"])
+            print(str(arr))
+            return arr
+        elif new_input == (0, 1) and i<25:
             arr[int(i/5)][(i)%5] = 0
             i += 1
             print(str(arr))
             player = play_sound(player, note_waves["append_tone"])
-        elif new_input == (1, 1):
+        elif new_input == (1, 1)and i<25:
             if one_count >= 15:
                 print("Cannot append another 1. (maximum 15 ones)")
                 player = play_sound(player, note_waves["error_tone"])
@@ -143,12 +140,6 @@ def read_user_input():
             i += 1
             print(str(arr))
             player = play_sound(player, note_waves["append_tone"])
-        elif new_input == (2, 0):
-            arr = [["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"]]
-            i = 0
-            one_count = 0
-            print(str(arr))
-            player = play_sound(player, note_waves["reset_tone"])
         elif new_input == (2, 1):
             i -= 1
             if (arr[int(i/5)][(i)%5]) == 1: one_count -= 1
@@ -157,12 +148,6 @@ def read_user_input():
             player = play_sound(player, note_waves["remove_tone"])
         else: continue
         time.sleep(0.2)
-
-    
-    #read in button touches to arr
-    player = play_sound(player, note_waves["complete_tone"])
-    print("Final array: " + str(arr))
-    return arr
 
 
 if __name__ == "__main__":
