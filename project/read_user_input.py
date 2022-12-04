@@ -58,7 +58,7 @@ def read_user_input():
     global error_tone
     global reset_tone
     arr = [["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"]]
-    print("Single click 1 button to append a '1' to the input array.\n Single click 0 button to append a '0' to the input array. \nSingle click the backspace button to remove the last element from the input array. \nHold click the backspace button to reset the input array.\nPress all three buttons at any time to finalize the input array (any undefined elements will be set to 0).")
+    print("Single click 1 button to append a '1' to the input array.\n Single click 0 button to append a '0' to the input array. \nSingle click the backspace button to remove the last element from the input array. \nHold click the backspace to submit array")
     i = 0
     one_count = 0
     while i < 25:
