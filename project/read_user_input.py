@@ -112,7 +112,7 @@ def read_user_input():
     """
     note_waves = init_waves()
     arr = [["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"], ["_","_","_","_","_"]]
-    print("Single click 1 button to append a '1' to the input array.\n Single click 0 button to append a '0' to the input array. \nSingle click the backspace button to remove the last element from the input array. \nHold click the backspace to submit array, will fill missing entries with 0")
+    print("Single click 1 button to append a '1' to the input array.\nSingle click 0 button to append a '0' to the input array. \nSingle click the backspace button to remove the last element from the input array. \nHold click the backspace to submit array, will fill missing entries with 0")
     i = 0
     one_count = 0
     player = None
@@ -123,12 +123,13 @@ def read_user_input():
                 arr[int(i/5)][(i)%5] = 0
                 i += 1
             player = play_sound(player, note_waves["complete_tone"])
-            print(str(arr))
+            print("Final Mosaic: ")
+            [print(*(convert_char(x) for x in row), sep=' ') for row in arr]
             return arr
         elif new_input == (0, 1) and i<25:
             arr[int(i/5)][(i)%5] = 0
             i += 1
-            print(str(arr))
+            [print(*(convert_char(x) for x in row), sep=' ') for row in arr]
             player = play_sound(player, note_waves["append_tone"])
         elif new_input == (1, 1)and i<25:
             if one_count >= 15:
@@ -138,26 +139,15 @@ def read_user_input():
             one_count += 1
             arr[int(i/5)][(i)%5] = 1
             i += 1
-            print(str(arr))
+            [print(*(convert_char(x) for x in row), sep=' ') for row in arr]
             player = play_sound(player, note_waves["append_tone"])
         elif new_input == (2, 1):
             i -= 1
             if (arr[int(i/5)][(i)%5]) == 1: one_count -= 1
             arr[int(i/5)][(i)%5] = "_"
-            print(str(arr))
+            [print(*(convert_char(x) for x in row), sep=' ') for row in arr]
             player = play_sound(player, note_waves["remove_tone"])
         else: continue
         time.sleep(0.2)
-
-
-if __name__ == "__main__":
-    print("Program start. Waiting for sensors.")
-    wait_ready_sensors(False) # Input True to see what the robot is trying to initialize! False to be silent.
-    print("Done waiting.")
-
-    input_arr = []
-    read_user_input(input_arr)
-
-    #once we reach this line our data is valid
                   
     

@@ -6,7 +6,7 @@ from json import dump, load
 from os import path
 from read_user_input import set_touch_sensors, read_user_input
 
-DEBUG = True                    # Debug mode (boolean) for extra prints
+DEBUG = False                    # Debug mode (boolean) for extra prints
 
 class Robot():
     X1_DIM = [None, None]        # X1 Dimensions min, max (in degrees)
@@ -73,8 +73,11 @@ class Robot():
             matrix (2D, int): 2D array of integers (0 or 1) where 1 is a cube, and 0 is an empty grid slot
         """
         for i in range(len(matrix)-1, -1, -1):
+            print(f"\tLoading bar {i}")
             robot.load_bar_deg(matrix[i])
+            print(f"\tPushing bar {i}")
             robot.push_bar(i)
+        print("\tFinished drawing")
     
     def calibrate_deg(self, load_existing=True):
         """Calibrates the system to identify the bounds of the grid. Automatically loads parameters if 'calibration.json' exists
@@ -90,16 +93,17 @@ class Robot():
                 self.X2_DIM = [x + self.X2_INIT_DEG for x in js['X2_DIM']]
                 self.Y1_DIM = [y + self.Y1_INIT_DEG for y in js['Y1_DIM']]
                 self.Y2_DIM = [y + self.Y2_INIT_DEG for y in js['Y2_DIM']]
+            print(f"\tFinal Dimensions: ({self.X1_DIM}), ({self.X2_DIM}) and ({self.Y1_DIM}), ({self.Y2_DIM})")
             return
         
         # X calibration, find min and max positions of the grid
         for pos in [0, 1]:
             while True:
-                if DEBUG: print(f"{self.MOTOR_X1.get_position()}, {self.MOTOR_X2.get_position()}")    # Print current position (ONLY IN DEBUG MODE)
+                if DEBUG: print(f"\tDEBUG - {self.MOTOR_X1.get_position()}, {self.MOTOR_X2.get_position()}")    # Print current position (ONLY IN DEBUG MODE)
                 
                 # If both buttons are pressed, "lock-in" the current position
                 if self.TOUCH_SENSOR1.is_pressed() and self.TOUCH_SENSOR2.is_pressed():
-                    if DEBUG: print("BREAKING")                     # Print when "breaking" out of the loop (ONLY IN DEBUG MODE)
+                    if DEBUG: print("\tDEBUG - BREAKING")                     # Print when "breaking" out of the loop (ONLY IN DEBUG MODE)
                     sleep(1)
                     break
                 elif self.TOUCH_SENSOR1.is_pressed():               # Forward
@@ -111,7 +115,7 @@ class Robot():
                 sleep(0.1)                                          # Sleep (refresh rate)
             self.X1_DIM[pos] = self.MOTOR_X1.get_position()           # Update current position
             self.X2_DIM[pos] = self.MOTOR_X2.get_position()
-            if DEBUG: print(f"Dimension {pos}: ({self.X1_DIM[pos]}) ({self.X2_DIM[pos]}")  # Print final dimensions (ONLY IN DEBUG MODE)
+            if DEBUG: print(f"\tDEBUG - Dimension {pos}: ({self.X1_DIM[pos]}) ({self.X2_DIM[pos]}")  # Print final dimensions (ONLY IN DEBUG MODE)
         # Move motor back to its initial position
         self.rotate_motor_deg([self.MOTOR_X1, self.MOTOR_X2], [self.X1_INIT_DEG, self.X2_INIT_DEG])
         #self.rotate_motor_deg(self.MOTOR_X2, self.X2_INIT_DEG)
@@ -119,11 +123,11 @@ class Robot():
         # Y calibration, find min and max positions of the grid
         for pos in [0, 1]:
             while True:
-                if DEBUG: print(f"{self.MOTOR_Y1.get_position()}, {self.MOTOR_Y2.get_position()}")    # Print current position (ONLY IN DEBUG MODE)
+                if DEBUG: print(f"\tDEBUG - {self.MOTOR_Y1.get_position()}, {self.MOTOR_Y2.get_position()}")    # Print current position (ONLY IN DEBUG MODE)
 
                 # If both buttons are pressed, "lock-in" the current position
                 if self.TOUCH_SENSOR1.is_pressed() and self.TOUCH_SENSOR2.is_pressed():
-                    if DEBUG: print("BREAKING")                     # Print when "breaking" out of the loop (ONLY IN DEBUG MODE)
+                    if DEBUG: print("\tDEBUG - BREAKING")                     # Print when "breaking" out of the loop (ONLY IN DEBUG MODE)
                     sleep(1)
                     break
                 elif self.TOUCH_SENSOR1.is_pressed():               # Forward
@@ -136,12 +140,12 @@ class Robot():
             self.Y1_DIM[pos] = self.MOTOR_Y1.get_position()         # Update current position
             self.Y2_DIM[pos] = self.MOTOR_Y2.get_position()
 
-            if DEBUG: print(f"Dimension {pos}: ({self.Y1_DIM[pos]}) ({self.Y2_DIM[pos]}")  # Print final dimensions (ONLY IN DEBUG MODE)
+            if DEBUG: print(f"\tDEBUG - Dimension {pos}: ({self.Y1_DIM[pos]}) ({self.Y2_DIM[pos]}")  # Print final dimensions (ONLY IN DEBUG MODE)
         # Move motor back to its initial position
         self.rotate_motor_deg([self.MOTOR_Y1, self.MOTOR_Y2], [self.Y1_INIT_DEG, self.Y2_INIT_DEG])
 
         # Report final recorded dimensions of the grid
-        #print(f"Final Dimensions: ({self.X1_DIM}), ({self.X2_DIM}) and ({self.Y1_DIM}), ({self.Y2_DIM})")
+        print(f"\tFinal Dimensions: ({self.X1_DIM}), ({self.X2_DIM}) and ({self.Y1_DIM}), ({self.Y2_DIM})")
         with open('calibration.json', 'w') as f:                    # Save calibration to 'calibration.json'
             
             js = {                                                  # Subtract initial position from min and from max position (only save relative position from initial)
@@ -186,6 +190,7 @@ class Robot():
         inc2 = (self.X2_DIM[0]-self.X2_DIM[1])/4
         for i in range(len(arr)-1, -1, -1):                         # Loop through the array backwards (last to first)
             if arr[i] == 0: continue                                # If there is no cube to place at this position, continue
+            print(f"\t\tLoading cube {i}")
             self.rotate_motor_deg([self.MOTOR_X1, self.MOTOR_X2], [round(self.X1_DIM[0]-inc1*i), round(self.X2_DIM[0]-inc2*i)])     # Rotate motor to desired position (X)
             #self.rotate_motor_deg(self.MOTOR_X2, round(self.X2_DIM[0]-inc2*i))
             self.rotate_motor_deg([self.MOTOR_X1, self.MOTOR_X2], [self.X1_INIT_DEG, self.X2_INIT_DEG])                # Return X motor back to initial position
@@ -243,10 +248,13 @@ STAIR = [
 if __name__ == "__main__":
     try:
         robot = Robot()                         # Initialize new Robot
+        print("Checking calibration:")
         robot.calibrate_deg()                   # Calibrate robot (auto or manual)
+        print("Reading user input:")
         matrix = read_user_input()              # Read user input array, pass by reference
-        #matrix = STAIR
+        print("Drawing mosaic:")
         robot.draw_matrix(matrix)               # Draw cubes on grid using input array
+        print("Completed... exiting")
     except Exception as e:
         # Handle error feedback here
         print(str(e))
