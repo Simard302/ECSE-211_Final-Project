@@ -249,11 +249,11 @@ if __name__ == "__main__":
     try:
         robot = Robot()                         # Initialize new Robot
         print("Checking calibration:")
-        robot.calibrate_deg()                   # Calibrate robot (auto or manual)
+        #robot.calibrate_deg()                   # Calibrate robot (auto or manual)
         print("Reading user input:")
         matrix = read_user_input()              # Read user input array, pass by reference
         print("Drawing mosaic:")
-        robot.draw_matrix(matrix)               # Draw cubes on grid using input array
+        #robot.draw_matrix(matrix)               # Draw cubes on grid using input array
         print("Completed... exiting")
     except Exception as e:
         # Handle error feedback here

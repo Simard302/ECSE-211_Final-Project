@@ -19,9 +19,9 @@ tone_duration = 0.5
 note_map = {
     "append_tone" : "A4",
     "remove_tone" : "B4",
-    "error_tone" : "C4",
+    "error_tone" : "E5",
     "reset_tone" : "G4",
-    "complete_tone" : "C5"
+    "complete_tone" : "Gb5"
 }        
 
 def set_touch_sensors(backButton, zeroButton, oneButton):
@@ -119,35 +119,51 @@ def read_user_input():
     while True:
         new_input = get_touch_input()
         if new_input == (3, 1): #submit command
-            while arr[4][4] != 0:
+            while arr[4][4] != 0 and arr[4][4] != 1:
                 arr[int(i/5)][(i)%5] = 0
                 i += 1
             player = play_sound(player, note_waves["complete_tone"])
             print("Final Mosaic: ")
-            [print(*(convert_char(x) for x in row), sep=' ') for row in arr]
+            print("=========")
+            [print(*(convert_char(x) for x in reversed(row)), sep=' ') for row in arr]
+            time.sleep(2)
             return arr
-        elif new_input == (0, 1) and i<25:
+        elif new_input == (0, 1):
+            if i>=25:
+                print("Cannot append another 0. (full array)")
+                player = play_sound(player, note_waves["error_tone"])
+                time.sleep(0.2)
+                continue
             arr[int(i/5)][(i)%5] = 0
             i += 1
-            [print(*(convert_char(x) for x in row), sep=' ') for row in arr]
+            print("=========")
+            [print(*(convert_char(x) for x in reversed(row)), sep=' ') for row in arr]
             player = play_sound(player, note_waves["append_tone"])
-        elif new_input == (1, 1)and i<25:
+        elif new_input == (1, 1):
+            if i>=25:
+                print("Cannot append another 1. (full array)")
+                player = play_sound(player, note_waves["error_tone"])
+                time.sleep(0.2)
+                continue
             if one_count >= 15:
                 print("Cannot append another 1. (maximum 15 ones)")
                 player = play_sound(player, note_waves["error_tone"])
+                time.sleep(0.2)
                 continue
             one_count += 1
             arr[int(i/5)][(i)%5] = 1
             i += 1
-            [print(*(convert_char(x) for x in row), sep=' ') for row in arr]
+            print("=========")
+            [print(*(convert_char(x) for x in reversed(row)), sep=' ') for row in arr]
             player = play_sound(player, note_waves["append_tone"])
         elif new_input == (2, 1):
             i -= 1
             if (arr[int(i/5)][(i)%5]) == 1: one_count -= 1
             arr[int(i/5)][(i)%5] = "_"
-            [print(*(convert_char(x) for x in row), sep=' ') for row in arr]
+            print("=========")
+            [print(*(convert_char(x) for x in reversed(row)), sep=' ') for row in arr]
             player = play_sound(player, note_waves["remove_tone"])
-        else: continue
+        else:continue
         time.sleep(0.2)
                   
     
